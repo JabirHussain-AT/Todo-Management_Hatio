@@ -9,7 +9,7 @@ import cookieParser from "cookie-parser";
 dotenv.config()
 
 // connecting database
-// require('./mongoose/config')
+require('./mongoose/config')
 
 const app = express();
 
