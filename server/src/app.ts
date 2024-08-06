@@ -2,7 +2,7 @@ import express, { Request , Response , NextFunction } from 'express';
 import dotenv from 'dotenv'
 import cors from "cors";
 import cookieParser from "cookie-parser";
-// import router from './routes'
+import router from './routes'
 // import { errorHandler } from './utils/errorHandler';
 
 //initialaizing the Env Configurations required for the project
@@ -31,9 +31,7 @@ app.use(
 );
 
 //Routes
-app.use('/api', ( req , res ) => {
-  res.send('its success')
-} );
+app.use('/api', router );
 
 
 // 404 Not Found middleware

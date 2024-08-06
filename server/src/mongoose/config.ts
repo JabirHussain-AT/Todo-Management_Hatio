@@ -5,8 +5,8 @@ mongoose.connect(process.env.MONGO_HOST)
 
 .then(()=>{
     console.log("Mongo db Connected")
-}).catch(()=>{
-console.log("Failed to connect");
+}).catch(( err : any )=>{
+console.log("Failed to connect",err);
 })
 
 module.exports = mongoose
