@@ -162,7 +162,7 @@ export const exportGist = async (req: Request, res: Response) => {
   
     const projectId = req.params.projectId;
     const todos = await Todo.find({projectId : projectId})
-    const project = await Project.findOne({ _id : projectId})
+    const project : any = await Project.findOne({ _id : projectId})
     const mdContent = convertToMarkdown(todos, project?.description);
     const gistUrl = await createGist(mdContent);
 
