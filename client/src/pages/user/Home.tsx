@@ -36,15 +36,17 @@ const Home = () => {
     setEditingProject(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleAddSubmit = async (e: React.FormEvent , localTitle : string , localDescription : string) => {
     e.preventDefault();
-    const newProject = { title, description };
+    const newProject = { title : localTitle, description  : localDescription };
     const response = await axios.post(
       `${BACKEND_URL}/api/v1/projects`,
       newProject,
       config
     );
-    setProjects([...projects, response.data.data]);
+    setProjects(()=>{
+      return [...projects ,response?.data.project]
+    });
     handleCloseModal();
   };
 
@@ -55,15 +57,14 @@ const Home = () => {
     setShowEditModal(true);
   };
 
-  const handleEditSubmit = async (e: React.FormEvent) => {
+  const handleEditSubmit = async (e: React.FormEvent , localTitle : string , localDescription : string) => {
     e.preventDefault();
-    const updatedProject = { title, description };
+    const updatedProject = { title : localTitle, description :  localDescription };
     const response = await axios.put(
       `${BACKEND_URL}/api/v1/projects/${editingProject._id}`,
       updatedProject,
       config
     );
-    console.log('response =============',response)
     const updatedProjects = projects.map((p: any) =>
       p._id === editingProject._id ? response.data.data : p
     );
@@ -71,15 +72,37 @@ const Home = () => {
     handleCloseModal();
   };
 
+  const handleDeleteProject = async (projectId: string) => {
+    try {
+      await axios.delete(`${BACKEND_URL}/api/v1/projects/${projectId}`, config);
+      setProjects(projects.filter((p: any) => p._id !== projectId));
+    } catch (error) {
+      console.error("Error deleting project:", error);
+    }
+  };
+
   const ProjectModal = ({ isEdit = false }) => {
-    const titleInputRef = useRef(null);
-    const descriptionInputRef = useRef(null);
+    const titleInputRef = useRef<HTMLInputElement>(null);
+    const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
+    const [localTitle, setLocalTitle] = useState(title);
+    const [localDescription, setLocalDescription] = useState(description);
   
     useEffect(() => {
       if (titleInputRef.current) {
         titleInputRef.current.focus();
       }
-    }, []);
+      setLocalTitle(title);
+      setLocalDescription(description);
+    }, [title, description]);
+  
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (isEdit) {
+        handleEditSubmit(e, localTitle, localDescription);
+      } else {
+        handleAddSubmit(e, localTitle, localDescription);
+      }
+    };
   
     return (
       <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
@@ -105,7 +128,7 @@ const Home = () => {
               </svg>
             </button>
           </div>
-          <form onSubmit={isEdit ? handleEditSubmit : handleSubmit}>
+          <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
@@ -117,8 +140,8 @@ const Home = () => {
                 type="text"
                 id="title"
                 ref={titleInputRef}
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={localTitle}
+                onChange={(e) => setLocalTitle(e.target.value)}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 required
               />
@@ -133,8 +156,8 @@ const Home = () => {
               <textarea
                 id="description"
                 ref={descriptionInputRef}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={localDescription}
+                onChange={(e) => setLocalDescription(e.target.value)}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
                 required
               />
@@ -153,8 +176,6 @@ const Home = () => {
     );
   };
   
-
-
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
@@ -171,11 +192,11 @@ const Home = () => {
         {projects?.length > 0 &&
           projects.map((project: any) => (
             <div
-              key={project._id}
+              key={project?._id}
               className="bg-white shadow-md rounded-lg p-4"
             >
-              <div className="flex justify-between ">
-                <h2 className="text-xl font-semibold mb-2">{project.title}</h2>
+              <div className="flex justify-between">
+                <h2 className="text-xl font-semibold mb-2">{project?.title}</h2>
                 <div>
                   <button 
                     onClick={() => handleEditClick(project)} 
@@ -184,14 +205,22 @@ const Home = () => {
                     edit
                   </button>
                   <button 
-                    onClick={() => navigate(`/project/${project._id}`)} 
+                    onClick={() => navigate(`/project/${project?._id}`)} 
                     className="px-1 py-1 bg-blue-400 rounded-md hover:scale-90"
                   >
                     view
                   </button>
+                  <button 
+                    onClick={() => handleDeleteProject(project._id)} 
+                    className="px-1 py-1 bg-red-400 rounded-md hover:scale-90 ml-2"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </button>
                 </div>
               </div>
-              <p className="text-gray-600">{project.description}</p>
+              <p className="text-gray-600">{project?.description}</p>
             </div>
           ))}
       </div>

@@ -9,11 +9,12 @@ import Todo from '../models/todoSchema'
 export const createProject = async (req: Request, res: Response) => {
   try {
     const { title, description } = req.body;
-    await Project.create({
+    const data = await Project.create({
       title: title,
       description: description,
     });
-    res.status(201).json({ message: "Project saved", success: true });
+    
+    res.status(201).json({ message: "Project saved", success: true , project : data });
   } catch (err: unknown) {
     console.log("Error in the project controller :", err);
     res
@@ -38,6 +39,22 @@ export const editProject = async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ message: "error in updating project, try again later " });
+  }
+};
+
+
+//delete project
+export const deleteProject = async (req: Request, res: Response) => {
+  try {
+    
+    const id = req.params.id
+    await Project.deleteOne({_id : id });
+    res.status(201).json({ message: "Project deleted", success : true });
+  } catch (err: unknown) {
+    console.log("Error in the project controller :", err);
+    res
+      .status(500)
+      .json({ message: "error in deleteing project, try again later " });
   }
 };
 
