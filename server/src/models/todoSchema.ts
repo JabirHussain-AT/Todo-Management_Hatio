@@ -3,12 +3,10 @@ const Schema = mongoose.Schema
 const todoSchema = new Schema({
     description: {
         type: String,
-        required: true
     },
-    status: {
-        type: String,
-        enum: ['pending', 'completed'],
-        default: 'pending'
+    isCompleted: {
+        type: Boolean,
+        default: 'false'
     },
     createdDate: {
         type: Date,
@@ -28,5 +26,5 @@ const todoSchema = new Schema({
     });
 
 
-const Todo = mongoose.model('Todo', todoSchema);
-module.exports = Todo;
+export default mongoose.model('Todo', todoSchema);
+
