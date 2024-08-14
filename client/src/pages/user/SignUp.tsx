@@ -38,7 +38,7 @@ const SignUp: React.FC = () => {
       toast.success("signup completed");
       navigate('/home');
     } else {
-      toast.error("otp is not valid");
+      toast.error( result?.data?.message );
     }
   };
 
@@ -63,7 +63,7 @@ const SignUp: React.FC = () => {
         setIsVerifyButtonDisabled(false);
       }, 1000 * 60 * 5);
     } else {
-      toast.error("Issue in sending otp , Try Later");
+      toast.error( result?.data?.message );
     }
   };
 

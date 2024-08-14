@@ -23,6 +23,7 @@ const TodoList: React.FC<TodoListProps> = ({ projectId }) => {
     fetchTodos();
   }, [projectId]);
 
+  //fetching todos
   const fetchTodos = async () => {
     try {
       const response = await axios.get(
@@ -30,12 +31,12 @@ const TodoList: React.FC<TodoListProps> = ({ projectId }) => {
         config
       );
       setTodos(response.data.data);
-      console.log(response.data.data);
     } catch (error) {
       console.error("Error fetching todos:", error);
     }
   };
 
+  //adding todo
   const addTodo = async () => {
     try {
       const response = await axios.post(
@@ -50,6 +51,7 @@ const TodoList: React.FC<TodoListProps> = ({ projectId }) => {
     }
   };
 
+  //updating todo
   const updateTodo = async (_id: string, updates: Partial<ITodo>) => {
     try {
       await axios.put(
@@ -58,11 +60,13 @@ const TodoList: React.FC<TodoListProps> = ({ projectId }) => {
         config
       );
       fetchTodos();
+      toast.success('To do item updated')
     } catch (error) {
       console.error("Error updating todo:", error);
     }
   };
 
+  //deleting todo
   const deleteTodo = async (_id: string) => {
     try {
       await axios.delete(
@@ -149,7 +153,7 @@ const TodoList: React.FC<TodoListProps> = ({ projectId }) => {
             onClick={() => exportAsGistView(projectId)}
             className="mt-4 bg-gray-800 text-white p-2 rounded flex items-center"
           >
-            <FaGithub className="mr-2" /> view as Gist
+            <FaGithub className="mr-2" /> View as Gist
           </button>
         </div>
       </div>
@@ -170,61 +174,72 @@ const TodoList: React.FC<TodoListProps> = ({ projectId }) => {
         </button>
       </div>
 
-      <h3 className="text-lg font-semibold mb-2">Pending Todos</h3>
-      {pendingTodos.map((todo) => (
-        <div
-          key={todo._id}
-          className="todo-item flex justify-between items-center mb-2 p-2 bg-gray-100 rounded"
-        >
-          <span>{todo.description}</span>
-          <div className="todo-actions space-x-2 flex items-center">
-            <FaEdit
-              onClick={() => {
-                const newDescription = prompt("Edit todo:", todo.description);
-                if (newDescription)
-                  updateTodo(todo._id, { description: newDescription });
-              }}
-              className="cursor-pointer text-blue-500"
-            />
-            <FaTrash
-              onClick={() => deleteTodo(todo._id)}
-              className="cursor-pointer text-red-500"
-            />
-            <input
-              type="checkbox"
-              checked={todo.isCompleted}
-              onChange={() =>
-                updateTodo(todo._id, { isCompleted: !todo.isCompleted })
-              }
-              className="cursor-pointer w-5 h-5"
-            />
-          </div>
-        </div>
-      ))}
+      {pendingTodos.length > 0 && (
+        <>
+          <h3 className="text-lg font-semibold mb-2">Pending Todos</h3>
+          {pendingTodos.map((todo) => (
+            <div
+              key={todo._id}
+              className="todo-item flex justify-between items-center mb-2 p-2 bg-gray-100 rounded"
+            >
+              <span>{todo.description}</span>
+              <div className="todo-actions space-x-2 flex items-center">
+                <FaEdit
+                  onClick={() => {
+                    const newDescription = prompt(
+                      "Edit todo:",
+                      todo.description
+                    );
+                    if (newDescription)
+                      updateTodo(todo._id, { description: newDescription });
+                  }}
+                  className="cursor-pointer text-blue-500"
+                />
+                <FaTrash
+                  onClick={() => deleteTodo(todo._id)}
+                  className="cursor-pointer text-red-500"
+                />
+                <input
+                  type="checkbox"
+                  checked={todo.isCompleted}
+                  onChange={() =>
+                    updateTodo(todo._id, { isCompleted: !todo.isCompleted })
+                  }
+                  className="cursor-pointer w-5 h-5"
+                />
+              </div>
+            </div>
+          ))}
+        </>
+      )}
 
-      <h3 className="text-lg font-semibold mt-4 mb-2">Completed Todos</h3>
-      {completedTodos.map((todo) => (
-        <div
-          key={todo._id}
-          className="todo-item flex justify-between items-center mb-2 p-2 bg-gray-200 rounded"
-        >
-          <span className="line-through">{todo.description}</span>
-          <div className="todo-actions space-x-2 flex items-center">
-            <FaTrash
-              onClick={() => deleteTodo(todo._id)}
-              className="cursor-pointer text-red-500"
-            />
-            <input
-              type="checkbox"
-              checked={todo.isCompleted}
-              onChange={() =>
-                updateTodo(todo._id, { isCompleted: !todo.isCompleted })
-              }
-              className="cursor-pointer w-5 h-5"
-            />
-          </div>
-        </div>
-      ))}
+      {completedTodos.length > 0 && (
+        <>
+          <h3 className="text-lg font-semibold mt-4 mb-2">Completed Todos</h3>
+          {completedTodos.map((todo) => (
+            <div
+              key={todo._id}
+              className="todo-item flex justify-between items-center mb-2 p-2 bg-gray-200 rounded"
+            >
+              <span className="line-through">{todo.description}</span>
+              <div className="todo-actions space-x-2 flex items-center">
+                <FaTrash
+                  onClick={() => deleteTodo(todo._id)}
+                  className="cursor-pointer text-red-500"
+                />
+                <input
+                  type="checkbox"
+                  checked={todo.isCompleted}
+                  onChange={() =>
+                    updateTodo(todo._id, { isCompleted: !todo.isCompleted })
+                  }
+                  className="cursor-pointer w-5 h-5"
+                />
+              </div>
+            </div>
+          ))}
+        </>
+      )}
     </div>
   );
 };

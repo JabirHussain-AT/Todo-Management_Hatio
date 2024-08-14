@@ -3,7 +3,8 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { BACKEND_URL } from '../../constants/constants';
 import { config } from '../../constants/config';
-import TodoList from '../../components/TodoList';  // Import the TodoList component
+import TodoList from '../../components/TodoList'; 
+import Loading from '../../components/Loadng';
 
 interface IProject {
     title: string;
@@ -28,13 +29,13 @@ const ProjectDetails: React.FC = () => {
   }, [id]);
 
   if (!project) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">{project.title}</h1>
-      <p className="text-gray-600 mb-4">{project.description}</p>
+    <div className="min-h-screen bg-gradient-to-r from-violet-400 to-purple-700 p-4">
+      <h1 className="text-3xl font-bold mb-4 text-white">{project.title}</h1>
+      <p className="text-gray-200 mb-4">{project.description}</p>
       
       {/* Add the TodoList component */}
       <TodoList projectId={id!} />

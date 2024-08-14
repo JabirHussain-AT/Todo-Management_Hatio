@@ -12,6 +12,15 @@ import { AuthenticateRequest } from "../interface/IAuthenticateRequest";
 export const sendOtp = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
+
+      // Check if the email already exists
+      const existingUser = await User.findOne({ email: email });
+
+      if (existingUser) {
+        return res 
+          .json({ message: "Email already in use", success: false });
+      }
+
     const otpGenerated = generateOtp(); //generating otp
     sendOtpFun(email, otpGenerated); //sending otp to the user
     const result = await Otp.create({
@@ -34,11 +43,13 @@ export const sendOtp = async (req: Request, res: Response) => {
 export const signUp = async (req: Request, res: Response) => {
   try {
     const { name, email, password, otpByUser } = req.body;
+
+
     //find otp with this email
     const { otp }: any = await Otp.find({ email: email });
 
     if (otp !== otpByUser) {
-      return res.json({ message: "otp not matching ", success: false });
+      return res.json({ message: "otp is not matching ", success: false });
     }
 
     const hashedPass = await hashPassword(password);
